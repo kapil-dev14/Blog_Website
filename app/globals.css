@@ -1,0 +1,176 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f5edda;
+  --paper-shade: #ebdfc2;
+  --ink: #2b2013;
+  --ink-soft: #5f4e37;
+  --ink-faint: #6b5a3c;
+  --rule: #d9c8a0;
+  --accent: #7a2432;
+  --accent-soft: #a8465370;
+  --gold: #a9812f;
+  --cover: #241811;
+  --cover-soft: #332215;
+  --gold-foil: #c9a15c;
+}
+
+* {
+  border-color: var(--rule);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -10%,
+      rgba(169, 129, 47, 0.07),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 10%,
+      rgba(122, 36, 50, 0.05),
+      transparent 55%
+    ),
+    repeating-radial-gradient(
+      circle at 0 0,
+      rgba(43, 32, 19, 0.025) 0,
+      rgba(43, 32, 19, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+/* Book-cover treatment for header/footer — the one bold move on the page.
+   Deep leather brown, gold-foil type, gold hairline edge. */
+.book-cover {
+  background: var(--cover);
+  background-image: linear-gradient(180deg, var(--cover-soft), var(--cover));
+  color: var(--gold-foil);
+}
+.book-cover a,
+.book-cover .foil {
+  color: var(--gold-foil);
+}
+
+/* A small ornamental divider — the flourish, used sparingly. */
+.flourish {
+  display: inline-block;
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--gold-foil);
+  opacity: 0.75;
+  font-size: 0.9rem;
+  transform: scaleY(1.1);
+}
+
+.font-display {
+  font-family: "Fraunces", Georgia, serif;
+  font-feature-settings: "ss01" 1;
+}
+
+.font-ui {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Article body typography */
+.prose-article {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.prose-article h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+.prose-article h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-article p {
+  margin-bottom: 1.4rem;
+}
+.prose-article a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+.prose-article ul,
+.prose-article ol {
+  margin: 1.2rem 0 1.4rem 1.4rem;
+}
+.prose-article li {
+  margin-bottom: 0.5rem;
+}
+.prose-article strong {
+  font-weight: 600;
+}
+.prose-article img {
+  border-radius: 4px;
+  margin: 2rem 0;
+}
+.prose-article blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1.2rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 1.6rem 0;
+}
+
+/* Drop cap on the first paragraph of an article (not poems — see below) */
+.prose-article:not(.prose-article--poem) > p:first-of-type::first-letter {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 3.8rem;
+  font-weight: 600;
+  float: left;
+  line-height: 0.85;
+  margin-right: 0.1rem;
+  margin-top: 0.2rem;
+  color: var(--accent);
+}
+
+/* Poems: centered, generous line-height, no drop cap, italic feel */
+.prose-article--poem {
+  text-align: center;
+  font-style: italic;
+  line-height: 2;
+}
+.prose-article--poem p {
+  margin-bottom: 1.8rem;
+}
+
+/* Ticket-style reading time badge */
+.ticket {
+  position: relative;
+  border: 1px dashed var(--ink-faint);
+  border-radius: 3px;
+  padding: 0.15rem 0.6rem;
+}
+
+/* Tiptap editor placeholder text in /admin */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--ink-faint);
+  pointer-events: none;
+  height: 0;
+}
+.ProseMirror:focus {
+  outline: none;
+}
