@@ -27,11 +27,14 @@ export default async function HomePage({
   const category = (params.category as Category | undefined) || undefined;
 
   const { posts, totalPages, total } = await getPosts(page, category);
-  const [featured, ...rest] =
-    page === 1 && !category ? posts : [undefined, ...posts];
-  // Only show the big "featured" hero on page 1 with no filter — otherwise treat
-  // every result as a normal list item so filtered/older pages read as a plain list.
-  const listPosts = featured ? rest : posts;
+  // const [featured, ...rest] =
+  //   page === 1 && !category ? posts : [undefined, ...posts];
+  // // Only show the big "featured" hero on page 1 with no filter — otherwise treat
+  // // every result as a normal list item so filtered/older pages read as a plain list.
+  // const listPosts = featured ? rest : posts;
+  const featured = page === 1 && !category ? posts[0] : undefined;
+
+  const listPosts = page === 1 && !category ? posts.slice(1) : posts;
 
   return (
     <div>
