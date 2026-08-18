@@ -25,7 +25,7 @@ export type Post = PostMeta & {
   contentHtml: string;
 };
 
-const PAGE_SIZE = 10;
+export const PAGE_SIZE = 10;
 
 function estimateReadingTime(html: string): string {
   const text = html.replace(/<[^>]*>/g, " ");
@@ -51,7 +51,7 @@ function toMeta(row: any): PostMeta {
 // Newest-first, paginated. page is 1-indexed.
 export async function getPosts(
   page = 1,
-  category?: Category
+  category?: Category,
 ): Promise<{ posts: PostMeta[]; total: number; totalPages: number }> {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
@@ -101,6 +101,36 @@ export async function getAllSlugs(): Promise<string[]> {
   return (data ?? []).map((r) => r.slug);
 }
 
+// Returns the post published just before and just after the given post
+// (by publish date), for the "previous entry / next entry" page-turn nav.
+export async function getAdjacentPosts(
+  publishedAt: string,
+): Promise<{ older: PostMeta | null; newer: PostMeta | null }> {
+  const [olderRes, newerRes] = await Promise.all([
+    supabase
+      .from("posts")
+      .select("*")
+      .eq("published", true)
+      .lt("published_at", publishedAt)
+      .order("published_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("posts")
+      .select("*")
+      .eq("published", true)
+      .gt("published_at", publishedAt)
+      .order("published_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  return {
+    older: olderRes.data ? toMeta(olderRes.data) : null,
+    newer: newerRes.data ? toMeta(newerRes.data) : null,
+  };
+}
+
 export function slugify(title: string): string {
   return title
     .toLowerCase()
@@ -108,6 +138,133 @@ export function slugify(title: string): string {
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+// Full-text search across title, summary, and content (weighted in that order —
+// see search_vector in supabase/schema.sql). Empty/short queries return nothing.
+export async function searchPosts(
+  query: string,
+  page = 1,
+): Promise<{ posts: PostMeta[]; total: number; totalPages: number }> {
+  const q = query.trim();
+  if (q.length < 2) return { posts: [], total: 0, totalPages: 1 };
+
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+  // websearch_to_tsquery understands plain search phrases (quotes, "OR", "-word", etc.)
+  const tsQuery = q
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => `${w}:*`)
+    .join(" & ");
+
+  const { data, error, count } = await supabase
+    .from("posts")
+    .select("*", { count: "exact" })
+    .eq("published", true)
+    .textSearch("search_vector", tsQuery, { config: "english" }) // no `type` — we already built raw tsquery syntax above
+    .order("published_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    console.error("searchPosts error:", error.message);
+    return { posts: [], total: 0, totalPages: 1 };
+  }
+
+  const total = count ?? 0;
+  return {
+    posts: (data ?? []).map(toMeta),
+    total,
+    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+  };
+}
+
+export type ArchiveGroup = {
+  year: number;
+  month: number;
+  label: string;
+  count: number;
+};
+
+// Groups all published posts by year+month, newest first — powers /archive.
+export async function getArchiveGroups(): Promise<ArchiveGroup[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("published_at")
+    .eq("published", true)
+    .order("published_at", { ascending: false });
+
+  if (error || !data) return [];
+
+  const groups = new Map<string, ArchiveGroup>();
+  for (const row of data) {
+    const d = new Date(row.published_at);
+    const year = d.getFullYear();
+    const month = d.getMonth(); // 0-indexed
+    const key = `${year}-${month}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        year,
+        month,
+        label: d.toLocaleString("en-US", { month: "long", year: "numeric" }),
+        count: 0,
+      });
+    }
+    groups.get(key)!.count += 1;
+  }
+
+  return [...groups.values()];
+}
+
+// Posts published in a specific year+month, newest first, paginated.
+export async function getPostsByMonth(
+  year: number,
+  month: number, // 0-indexed
+  page = 1,
+): Promise<{ posts: PostMeta[]; total: number; totalPages: number }> {
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+  const start = new Date(year, month, 1).toISOString();
+  const end = new Date(year, month + 1, 1).toISOString();
+
+  const { data, error, count } = await supabase
+    .from("posts")
+    .select("*", { count: "exact" })
+    .eq("published", true)
+    .gte("published_at", start)
+    .lt("published_at", end)
+    .order("published_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    console.error("getPostsByMonth error:", error.message);
+    return { posts: [], total: 0, totalPages: 1 };
+  }
+
+  const total = count ?? 0;
+  return {
+    posts: (data ?? []).map(toMeta),
+    total,
+    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+  };
+}
+
+// All published posts, for the RSS feed — no pagination needed, capped at a sane limit.
+export async function getPostsForFeed(limit = 50): Promise<Post[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data.map((row) => ({
+    ...toMeta(row),
+    contentHtml: row.content_html ?? "",
+  }));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -138,7 +295,11 @@ export async function adminGetAllPosts(page = 1) {
 
 export async function adminGetPost(id: number) {
   const admin = getSupabaseAdmin();
-  const { data, error } = await admin.from("posts").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await admin
+    .from("posts")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }

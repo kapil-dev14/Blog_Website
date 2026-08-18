@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getPosts, CATEGORIES, type Category } from "@/lib/posts";
+import { getPosts, PAGE_SIZE, CATEGORIES, type Category } from "@/lib/posts";
 import { format } from "date-fns";
+import Pagination from "@/components/Pagination";
 import {
   Feather,
   BookOpen,
@@ -180,23 +181,14 @@ export default async function HomePage({
         </>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-14 font-ui text-sm">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <Link
-              key={p}
-              href={`/?page=${p}${category ? `&category=${category}` : ""}`}
-              className={`w-8 h-8 flex items-center justify-center rounded-sm border transition-colors ${
-                p === page
-                  ? "border-accent text-accent"
-                  : "border-rule text-ink-soft hover:border-accent"
-              }`}
-            >
-              {p}
-            </Link>
-          ))}
-        </div>
-      )}
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        totalItems={total}
+        pageSize={PAGE_SIZE}
+        basePath="/"
+        extraParams={category ? { category } : undefined}
+      />
     </div>
   );
 }
