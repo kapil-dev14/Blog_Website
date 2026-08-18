@@ -5,6 +5,8 @@ import { Feather, Archive as ArchiveIcon, Rss } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
+
 export const metadata: Metadata = {
   title: {
     default: "The Unwritten Hour",
@@ -87,6 +89,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
       </body>
     </html>
   );
