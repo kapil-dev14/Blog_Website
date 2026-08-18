@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import { Feather, Archive as ArchiveIcon, Rss } from "lucide-react";

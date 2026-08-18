@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
+
 import Image from "next/image";
 import { getPosts, PAGE_SIZE, CATEGORIES, type Category } from "@/lib/posts";
 import { format } from "date-fns";
@@ -178,6 +180,7 @@ export default async function HomePage({
               );
             })}
           </div>
+          <Analytics />
         </>
       )}
 
