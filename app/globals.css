@@ -174,3 +174,153 @@ body {
 .ProseMirror:focus {
   outline: none;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Archive — a quiet library/index treatment
+   ───────────────────────────────────────────────────────────── */
+.archive-summary {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.archive-stat-number {
+  display: block;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.65rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.archive-stat-label {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+}
+.archive-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem 1rem;
+}
+.archive-category {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--ink-faint);
+}
+.archive-months {
+  border-top: 1px solid var(--rule);
+}
+.archive-month {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+}
+.archive-month-name {
+  width: 5.25rem;
+  color: var(--ink-soft);
+  transition: color 160ms ease;
+}
+.archive-month-line {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  opacity: 0.7;
+  transition:
+    background 160ms ease,
+    opacity 160ms ease;
+}
+.archive-month-count {
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.archive-month:hover .archive-month-name {
+  color: var(--accent);
+}
+.archive-month:hover .archive-month-line {
+  background: var(--accent);
+  opacity: 0.5;
+}
+.paper-note {
+  border: 1px solid var(--rule);
+  background: rgba(235, 223, 194, 0.32);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reading mode — removes the book-cover chrome and gives the
+   writing a calmer, more focused reading surface.
+   ───────────────────────────────────────────────────────────── */
+.reading-mode-toggle {
+  opacity: 0.92;
+}
+body.reading-mode-active {
+  background-image: none;
+}
+body.reading-mode-active > header,
+body.reading-mode-active > footer {
+  display: none;
+}
+body.reading-mode-active main {
+  max-width: 50rem;
+  padding-top: 5.5rem;
+  padding-bottom: 5rem;
+}
+body.reading-mode-active .reading-mode-toggle {
+  background: var(--cover);
+  color: var(--gold-foil);
+  border-color: rgba(201, 161, 92, 0.45);
+}
+body.reading-mode-active .reading-mode-toggle:hover {
+  border-color: var(--gold-foil);
+  color: var(--gold-foil);
+}
+body.reading-mode-active .prose-article {
+  max-width: 46rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.22rem;
+  line-height: 1.95;
+}
+body.reading-mode-active .prose-article--poem {
+  font-size: 1.2rem;
+  line-height: 2.15;
+}
+body.reading-mode-active .reading-mode-hide {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .archive-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .archive-categories {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .archive-month {
+    gap: 0.65rem;
+  }
+  .archive-month-name {
+    width: 4.25rem;
+  }
+  body.reading-mode-active main {
+    padding-top: 4.5rem;
+  }
+  body.reading-mode-active .prose-article {
+    font-size: 1.1rem;
+    line-height: 1.9;
+  }
+}

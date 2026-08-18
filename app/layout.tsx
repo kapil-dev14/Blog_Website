@@ -37,7 +37,9 @@ export default function RootLayout({
               <span className="flourish">❧</span>
               <span className="font-ui text-[0.7rem] uppercase tracking-[0.2em] opacity-70">
                 Prose, Poems &amp; Chapters by{" "}
-                <span className="foil font-medium">Kapil</span>
+                <span className="foil font-medium">
+                  <b>Kapil</b>
+                </span>
               </span>
               <span className="flourish">❧</span>
             </div>
@@ -51,13 +53,13 @@ export default function RootLayout({
               >
                 <ArchiveIcon className="w-4 h-4" strokeWidth={1.75} />
               </Link>
-              <Link
+              {/* <Link
                 href="/feed.xml"
                 aria-label="RSS feed"
                 className="p-2 rounded-sm border border-gold-foil/30 text-gold-foil hover:border-gold-foil transition-colors"
               >
                 <Rss className="w-4 h-4" strokeWidth={1.75} />
-              </Link>
+              </Link> */}
             </div>
           </div>
         </header>
