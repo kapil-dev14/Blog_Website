@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "अक्षरहरू|The Unwritten Hour",
+    default: "The Unwritten Hour",
     template: "%s | My Blog",
   },
   description: "Thoughts, stories, and ideas — written by me.",
